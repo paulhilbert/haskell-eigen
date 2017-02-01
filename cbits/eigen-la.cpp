@@ -60,6 +60,54 @@ RET image(Decomposition d, void** p0, int* r0, int* c0, const void* p1, int r1, 
 API(image, (int code, Decomposition d, void** p0, int* r0, int* c0, const void* p1, int r1, int c1), (d,p0,r0,c0,p1,r1,c1));
 
 template <class T>
+RET jacobiSVDFull(void* pu, int ru, int cu,
+    void* ps, int rs, int cs,
+    void* pv, int rv, int cv,
+    const void* pa, int ra, int ca)
+{
+    typedef Map< Matrix<T,Dynamic,Dynamic> > MapMatrix;
+    typedef Map< Matrix<double,Dynamic,Dynamic> > MapRealMatrix;
+    typedef Eigen::JacobiSVD< Matrix<T,Dynamic,Dynamic> > SVD;
+    MapMatrix u((T*)pu, ru, cu);
+    MapRealMatrix s((double*)ps, rs, cs);
+    MapMatrix v((T*)pv, rv, cv);
+    MapMatrix A((const T*)pa, ra, ca);
+    SVD svd(A, ComputeFullU | ComputeFullV);
+    s = svd.singularValues().template cast<double>();
+    u = svd.matrixU();
+    v = svd.matrixV();
+    return 0;
+}
+API(jacobiSVDFull, (int code, void* pu, int ru, int cu,
+    void* ps, int rs, int cs,
+    void* pv, int rv, int cv,
+    const void* pa, int ra, int ca), (pu,ru,cu,ps,rs,cs,pv,rv,cv,pa,ra,ca));
+
+template <class T>
+RET jacobiSVDThin(void* pu, int ru, int cu,
+    void* ps, int rs, int cs,
+    void* pv, int rv, int cv,
+    const void* pa, int ra, int ca)
+{
+    typedef Map< Matrix<T,Dynamic,Dynamic> > MapMatrix;
+    typedef Map< Matrix<double,Dynamic,Dynamic> > MapRealMatrix;
+    typedef Eigen::JacobiSVD< Matrix<T,Dynamic,Dynamic> > SVD;
+    MapMatrix u((T*)pu, ru, cu);
+    MapRealMatrix s((double*)ps, rs, cs);
+    MapMatrix v((T*)pv, rv, cv);
+    MapMatrix A((const T*)pa, ra, ca);
+    SVD svd(A, ComputeThinU | ComputeThinV);
+    s = svd.singularValues().template cast<double>();
+    u = svd.matrixU();
+    v = svd.matrixV();
+    return 0;
+}
+API(jacobiSVDThin, (int code, void* pu, int ru, int cu,
+    void* ps, int rs, int cs,
+    void* pv, int rv, int cv,
+    const void* pa, int ra, int ca), (pu,ru,cu,ps,rs,cs,pv,rv,cv,pa,ra,ca));
+
+template <class T>
 RET solve(Decomposition d,
     void* px, int rx, int cx,
     const void* pa, int ra, int ca,

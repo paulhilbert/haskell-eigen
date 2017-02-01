@@ -129,9 +129,6 @@ call func = func >>= \c_str -> when (c_str /= nullPtr) $
 
 foreign import ccall "eigen-proxy.h free" free :: Ptr a -> IO ()
 
-foreign import ccall "eigen-proxy.h eigen_setNbThreads" c_setNbThreads :: CInt -> IO ()
-foreign import ccall "eigen-proxy.h eigen_getNbThreads" c_getNbThreads :: IO CInt
-
 class Code a where; code :: a -> CInt
 instance Code CFloat where; code _ = 0
 instance Code CDouble where; code _ = 1
@@ -172,6 +169,8 @@ magicCode x = MagicCode (code x `xor` 0x45696730)
 #api1 rank,          "CInt -> Ptr CInt -> Ptr b -> CInt -> CInt -> IO CString"
 #api1 image,         "CInt -> Ptr (Ptr b) -> Ptr CInt -> Ptr CInt -> Ptr b -> CInt -> CInt -> IO CString"
 #api1 kernel,        "CInt -> Ptr (Ptr b) -> Ptr CInt -> Ptr CInt -> Ptr b -> CInt -> CInt -> IO CString"
+#api1 jacobiSVDFull, "Ptr b -> CInt -> CInt -> Ptr CDouble -> CInt -> CInt -> Ptr b -> CInt -> CInt -> Ptr b -> CInt -> CInt -> IO CString"
+#api1 jacobiSVDThin, "Ptr b -> CInt -> CInt -> Ptr CDouble -> CInt -> CInt -> Ptr b -> CInt -> CInt -> Ptr b -> CInt -> CInt -> IO CString"
 #api1 solve,         "CInt -> Ptr b -> CInt -> CInt -> Ptr b -> CInt -> CInt -> Ptr b -> CInt -> CInt -> IO CString"
 #api1 relativeError, "Ptr b -> Ptr b -> CInt -> CInt -> Ptr b -> CInt -> CInt -> Ptr b -> CInt -> CInt -> IO CString"
 

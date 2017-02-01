@@ -21,6 +21,23 @@ const char* eigen_rank(int, Decomposition d, int*, const void*, int, int);
 const char* eigen_kernel(int, Decomposition d, void**, int*, int*, const void*, int, int);
 const char* eigen_image(int, Decomposition d, void**, int*, int*, const void*, int, int);
 
+const char* eigen_jacobiSVDFull(int,
+	void*, int, int, // U
+	void*, int, int, // sigma
+	void*, int, int, // V
+	const void*, int, int); // A
+
+const char* eigen_jacobiSVDThin(int,
+	void*, int, int, // U
+	void*, int, int, // sigma
+	void*, int, int, // V
+	const void*, int, int); // A
+
+const char* eigen_solve(int, Decomposition d, // Ax=b 
+	void*, int, int, // x
+	const void*, int, int, // A
+	const void*, int, int); // b
+
 const char* eigen_solve(int, Decomposition d, // Ax=b 
 	void*, int, int, // x
 	const void*, int, int, // A

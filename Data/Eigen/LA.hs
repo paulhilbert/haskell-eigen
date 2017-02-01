@@ -58,6 +58,8 @@ You can compute relative error using @'norm' (ax - b) / 'norm' b@ formula or use
 module Data.Eigen.LA (
     -- * Basic linear solving
     Decomposition(..),
+    jacobiSVDFull,
+    jacobiSVDThin,
     solve,
     relativeError,
     -- * Rank-revealing decompositions
@@ -155,6 +157,44 @@ data Decomposition
     -- | Two-sided Jacobi SVD decomposition of a rectangular matrix.
     | JacobiSVD deriving (Eq, Enum, Show, Read)
 
+-- | [(u,s,v) = jacobiSVDFull a] finds a decomposition @a@ = @u@ @s@ @v@* (singular values are in decreasing order)
+jacobiSVDFull :: I.Elem a b => Matrix a b -> (Matrix a b, MatrixXd, Matrix a b)
+jacobiSVDFull a = I.performIO $ do
+    u <- M.new (rows a) (rows a)
+    s <- M.new (min (rows a) (cols a)) 1
+    v <- M.new (cols a) (cols a)
+    M.unsafeWith u $ \u_vals u_rows u_cols ->
+        M.unsafeWith s $ \s_vals s_rows s_cols ->
+            M.unsafeWith v $ \v_vals v_rows v_cols ->
+                unsafeWith a $ \a_vals a_rows a_cols ->
+                    I.call $ I.jacobiSVDFull u_vals u_rows u_cols
+                                             s_vals s_rows s_cols
+                                             v_vals v_rows v_cols
+                                             a_vals a_rows a_cols
+    imu <- unsafeFreeze u
+    ims <- unsafeFreeze s
+    imv <- unsafeFreeze v
+    return (imu, ims, imv)
+
+-- | [(u,s,v) = jacobiSVDThin a] finds a decomposition @a@ = @u@ @s@ @v@* (only singular vectors corresponding to the rank are stored; singular values are in decreasing order)
+jacobiSVDThin :: I.Elem a b => Matrix a b -> (Matrix a b, MatrixXd, Matrix a b)
+jacobiSVDThin a = I.performIO $ do
+    m <- return $ min (rows a) (cols a)
+    u <- M.new (rows a) m
+    s <- M.new m 1
+    v <- M.new (cols a) m
+    M.unsafeWith u $ \u_vals u_rows u_cols ->
+        M.unsafeWith s $ \s_vals s_rows s_cols ->
+            M.unsafeWith v $ \v_vals v_rows v_cols ->
+                unsafeWith a $ \a_vals a_rows a_cols ->
+                    I.call $ I.jacobiSVDThin u_vals u_rows u_cols
+                                             s_vals s_rows s_cols
+                                             v_vals v_rows v_cols
+                                             a_vals a_rows a_cols
+    imu <- unsafeFreeze u
+    ims <- unsafeFreeze s
+    imv <- unsafeFreeze v
+    return (imu, ims, imv)
 
 -- | [x = solve d a b] finds a solution @x@ of @ax = b@ equation using decomposition @d@
 solve :: I.Elem a b => Decomposition -> Matrix a b -> Matrix a b -> Matrix a b

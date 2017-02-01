@@ -1313,8 +1313,7 @@ library
                         transformers >= 0.3
 
     include-dirs:       eigen3, cbits
-    c-sources:          cbits/eigen-runtime.cpp
-                        cbits/eigen-dense.cpp
+    c-sources:          cbits/eigen-dense.cpp
                         cbits/eigen-sparse.cpp
                         cbits/eigen-la.cpp
                         cbits/eigen-sparse-la.cpp
